@@ -6,13 +6,30 @@ int main()
 {
 	SimOS sim{ 3, 1000, 10 };
 
-    /*
-	sim.NewProcess();
+    bool allTestsClean = true;
+
+    // @Test NewProcess and Ready Queue
+    sim.NewProcess();
+    auto readyQueue1 = sim.GetReadyQueue();
+    for(const auto& item : readyQueue1) {
+        std::cout << item << " ";
+    }
+
+    std::cout << std::endl;
+
 	if (sim.GetCPU() != 1)
 	{
 		allTestsClean = false;
 		std::cout << "Test on the line 16 fails!" << std::endl;
 	}
+
+    std::deque<int> readyQueue{ sim.GetReadyQueue() };
+	if (readyQueue.size() != 0)
+	{
+		allTestsClean = false;
+		std::cout << "Test on the line 58 fails!" << std::endl;
+	}
+
 
 	sim.DiskReadRequest(0, "file1.txt");
 	if (sim.GetCPU() != NO_PROCESS)
@@ -21,12 +38,15 @@ int main()
 		std::cout << "Test on the line 23 fails!" << std::endl;
 	}
 
+    
 	FileReadRequest request{ sim.GetDisk(0) };
 	if (request.PID != 1 || request.fileName != "file1.txt")
 	{
 		allTestsClean = false;
 		std::cout << "Test on the line 30 fails!" << std::endl;
 	}
+
+    /*
 
 	std::deque<FileReadRequest> ioQueue0{ sim.GetDiskQueue(0) };
 	if (ioQueue0.size() != 0)
@@ -47,13 +67,6 @@ int main()
 	{
 		allTestsClean = false;
 		std::cout << "Test on the line 51 fails!" << std::endl;
-	}
-
-	std::deque<int> readyQueue{ sim.GetReadyQueue() };
-	if (readyQueue.size() != 0)
-	{
-		allTestsClean = false;
-		std::cout << "Test on the line 58 fails!" << std::endl;
 	}
 
 	sim.SimFork();
@@ -107,5 +120,11 @@ int main()
 		std::cout << "These preliminary tests are passed" << std::endl;
 
     */
+
+    if (allTestsClean)
+    {
+        std::cout << "All tests passed!" << std::endl;
+    }
+
 	return 0;
 }
