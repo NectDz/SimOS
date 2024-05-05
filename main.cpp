@@ -30,7 +30,14 @@ int main()
 		std::cout << "Test on the line 58 fails!" << std::endl;
 	}
 
+    // Display Disks from Vector
+    /*
+    const auto& disks = sim.GetDisks();
+    for (std::vector<Disk>::size_type i = 0; i < disks.size(); i++) {
+        std::cout << disks[i].getDiskNumber() << " ";
+    }*/
 
+    /*
 	sim.DiskReadRequest(0, "file1.txt");
 	if (sim.GetCPU() != NO_PROCESS)
 	{
@@ -46,7 +53,7 @@ int main()
 		std::cout << "Test on the line 30 fails!" << std::endl;
 	}
 
-    /*
+
 
 	std::deque<FileReadRequest> ioQueue0{ sim.GetDiskQueue(0) };
 	if (ioQueue0.size() != 0)
