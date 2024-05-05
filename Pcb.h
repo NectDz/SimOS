@@ -7,12 +7,11 @@
 class PCB {
 public:
     int PID;                        
-    std::string state;              
-    int priority;                   
+    std::string state;                      
     int programCounter;             
 
     // Constructor
-    PCB(int id, int prio) : PID(id), priority(prio), state("New"), programCounter(0) {}
+    PCB(int id) : PID(id), state("New"), programCounter(0) {}
 
 };
 

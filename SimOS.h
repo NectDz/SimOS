@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include "PCB.h"
 
 struct FileReadRequest
 {
@@ -30,6 +31,11 @@ class SimOS
         this->pageSize = pageSize;
     }
 
+    void NewProcess( ){
+        // Create a new PCB object
+        PCB newProcess(1, 1);
+    }
+
     // Getters
     int getNumberOfDisks() const { return numberOfDisks; }
     
@@ -39,6 +45,8 @@ class SimOS
         int numberOfDisks;
         unsigned long long amountOfRAM;
         unsigned int pageSize;
+        std::deque<int> readyQueue; 
+        int currentPID;  
 };
 
 
