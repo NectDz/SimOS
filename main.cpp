@@ -42,7 +42,6 @@ int main()
 		std::cout << "DiskReadRequest Test Fail" << std::endl;
 	}
 
-    
 	FileReadRequest request{ sim.GetDisk(0) };
 	if (request.PID != 1 || request.fileName != "file1.txt")
 	{
@@ -50,7 +49,6 @@ int main()
 		std::cout << "GetDisk Test fails" << std::endl;
 	}
 
-    /*
 	std::deque<FileReadRequest> ioQueue0{ sim.GetDiskQueue(0) };
 	if (ioQueue0.size() != 0)
 	{
@@ -58,6 +56,7 @@ int main()
 		std::cout << "Test on the line 37 fails!" << std::endl;
 	}
 
+    /*
 	sim.DiskJobCompleted(0);
 	request = sim.GetDisk(0);
 	if (request.PID != NO_PROCESS || request.fileName != "")

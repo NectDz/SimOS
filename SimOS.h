@@ -89,6 +89,10 @@ class SimOS
 
         return disks[diskNumber].processRequest();
     }
+    
+    std::deque<FileReadRequest> GetDiskQueue( int diskNumber ){
+        return disks[diskNumber].getIOQueue();
+    }
 
     std::deque<int> GetReadyQueue( ){
         return readyQueue;

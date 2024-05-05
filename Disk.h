@@ -35,6 +35,10 @@ public:
     int getDiskNumber() const {
         return diskNumber;
     }
+
+    std::deque<FileReadRequest> getIOQueue() const {
+        return ioQueue;
+    }
 };
 
 #endif
