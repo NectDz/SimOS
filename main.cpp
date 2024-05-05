@@ -35,8 +35,6 @@ int main()
         std::cout << "Get Disk Count Fail" << std::endl;
     }   
 
-
-    
 	sim.DiskReadRequest(0, "file1.txt");
 	if (sim.GetCPU() != NO_PROCESS)
 	{
