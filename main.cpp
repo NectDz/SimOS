@@ -39,19 +39,18 @@ int main()
 	if (sim.GetCPU() != NO_PROCESS)
 	{
 		allTestsClean = false;
-		std::cout << "Test on the line 23 fails!" << std::endl;
+		std::cout << "DiskReadRequest Test Fail" << std::endl;
 	}
 
-    /*
+    
 	FileReadRequest request{ sim.GetDisk(0) };
 	if (request.PID != 1 || request.fileName != "file1.txt")
 	{
 		allTestsClean = false;
-		std::cout << "Test on the line 30 fails!" << std::endl;
+		std::cout << "GetDisk Test fails" << std::endl;
 	}
 
-
-
+    /*
 	std::deque<FileReadRequest> ioQueue0{ sim.GetDiskQueue(0) };
 	if (ioQueue0.size() != 0)
 	{
