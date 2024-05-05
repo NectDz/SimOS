@@ -2,6 +2,7 @@
 #define SIM_OS_H
 
 #include <vector>
+#include <string>
 
 struct FileReadRequest
 {
