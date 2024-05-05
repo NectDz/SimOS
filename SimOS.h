@@ -5,13 +5,9 @@
 #include <string>
 #include <deque>
 #include "PCB.h"
+#include "Disk.h"
+#include "FileReadRequest.h"
 
-struct FileReadRequest
-{
-    int  PID{0};
-    std::string fileName{""};
-};
- 
 struct MemoryItem
 {
     unsigned long long pageNumber;
@@ -34,8 +30,15 @@ class SimOS
         CreateDisks(numberOfDisks);
     }
 
+    // Creates Number of Disks
     void CreateDisks( int numberOfDisks ){
-        // Create a number of disks
+        int startDiskNumber = 0;
+
+        for (int i = 0; i < numberOfDisks; i++){
+            Disk newDisk(startDiskNumber);
+            disks.push_back(newDisk);
+            startDiskNumber++;
+        }
     }
 
     void NewProcess( ){
@@ -67,26 +70,32 @@ class SimOS
         return currentPID;
     }
 
+ 
     void DiskReadRequest( int diskNumber, std::string fileName ){
         // Look up PCB using PID and change the state to waiting
 
         // Add the process to the IO queue
-        ioQueue.push_back(currentPID);
+        disks[diskNumber].addRequest(FileReadRequest{currentPID, fileName});
 
-        // Change the currentPID to NO_PROCESS
+        // Change the currentPID to NO_PROCESS || # Might need to change this to the next process in the ready queue
         currentPID = NO_PROCESS;
     }
 
+
     FileReadRequest GetDisk( int diskNumber ){
-        // Implement looking by diskNumber
-        FileReadRequest request;
-        request.PID = ioQueue.front();
-        request.fileName = "file1.txt";
-        return request;
+        if (disks[diskNumber].isQueueEmpty()){
+            return FileReadRequest{NO_PROCESS, ""};
+        }
+
+        return disks[diskNumber].processRequest();
     }
 
     std::deque<int> GetReadyQueue( ){
         return readyQueue;
+    }
+
+    std::vector<Disk> GetDisks( ){
+        return disks;
     }
 
     // Getters
@@ -99,7 +108,8 @@ class SimOS
         unsigned long long amountOfRAM;
         unsigned int pageSize;
         std::deque<int> readyQueue; 
-        int currentPID;  
+        std::vector<Disk> disks;
+        int currentPID = NO_PROCESS;  
         int lastPID = 0 ;
 };
 

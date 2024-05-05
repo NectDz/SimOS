@@ -10,11 +10,7 @@ int main()
 
     // @Test NewProcess and Ready Queue
     sim.NewProcess();
-    auto readyQueue1 = sim.GetReadyQueue();
-    for(const auto& item : readyQueue1) {
-        std::cout << item << " ";
-    }
-
+    
     std::cout << std::endl;
 
 	if (sim.GetCPU() != 1)
