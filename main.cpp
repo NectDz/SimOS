@@ -10,30 +10,33 @@ int main()
 
     // @Test NewProcess and Ready Queue
     sim.NewProcess();
-    
+
     std::cout << std::endl;
 
 	if (sim.GetCPU() != 1)
 	{
 		allTestsClean = false;
-		std::cout << "Test on the line 16 fails!" << std::endl;
+		std::cout << "Get CPU Fail" << std::endl;
 	}
 
     std::deque<int> readyQueue{ sim.GetReadyQueue() };
 	if (readyQueue.size() != 0)
 	{
 		allTestsClean = false;
-		std::cout << "Test on the line 58 fails!" << std::endl;
+		std::cout << "Get Ready Queue Fail" << std::endl;
 	}
 
     // Display Disks from Vector
-    /*
-    const auto& disks = sim.GetDisks();
-    for (std::vector<Disk>::size_type i = 0; i < disks.size(); i++) {
-        std::cout << disks[i].getDiskNumber() << " ";
-    }*/
+    
+    std::vector<Disk> disks = sim.GetDisks();
+    if (disks.size() != 3)
+    {
+        allTestsClean = false;
+        std::cout << "Get Disk Count Fail" << std::endl;
+    }   
 
-    /*
+
+    
 	sim.DiskReadRequest(0, "file1.txt");
 	if (sim.GetCPU() != NO_PROCESS)
 	{
@@ -41,7 +44,7 @@ int main()
 		std::cout << "Test on the line 23 fails!" << std::endl;
 	}
 
-    
+    /*
 	FileReadRequest request{ sim.GetDisk(0) };
 	if (request.PID != 1 || request.fileName != "file1.txt")
 	{
