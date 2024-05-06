@@ -49,13 +49,6 @@ int main()
 		std::cout << "GetDisk Test fails" << std::endl;
 	}
 
-	std::deque<FileReadRequest> ioQueue0{ sim.GetDiskQueue(0) };
-	if (ioQueue0.size() != 0)
-	{
-		allTestsClean = false;
-		std::cout << "Test on the line 37 fails!" << std::endl;
-	}
-
 	sim.DiskJobCompleted(0);
 	request = sim.GetDisk(0);
 	if (request.PID != NO_PROCESS || request.fileName != "")
@@ -64,13 +57,21 @@ int main()
 		std::cout << "DiskJobCompleted Test fails!" << std::endl;
 	}
 
-    /*
+	// Go Back to this test case
+	std::deque<FileReadRequest> ioQueue0{ sim.GetDiskQueue(0) };
+	if (ioQueue0.size() != 0)
+	{
+		allTestsClean = false;
+		std::cout << "Test on the line 37 fails!" << std::endl;
+	}
+
 	if (sim.GetCPU() != 1)
 	{
 		allTestsClean = false;
-		std::cout << "Test on the line 51 fails!" << std::endl;
+		std::cout << "GetCPU on the line 70 fails!" << std::endl;
 	}
 
+    /*
 	sim.SimFork();
 	readyQueue = sim.GetReadyQueue();
 	if (readyQueue[0] != 2)

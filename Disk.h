@@ -6,7 +6,7 @@
 #include <deque>
 #include "PCB.h"
 #include "FileReadRequest.h"
-
+#include <iostream>
 class Disk {
 private:
     int diskNumber;
@@ -20,18 +20,16 @@ public:
     }
 
     const FileReadRequest processRequest() {
+        return ioQueue.front();
+    }
+
+    const FileReadRequest DiskJobCompleted(){
         FileReadRequest request;
         if (!ioQueue.empty()) {
             request = ioQueue.front();
             ioQueue.pop_front();
         }
         return request;
-    }
-
-    void DiskJobCompleted(){
-        if (!ioQueue.empty()) {
-            ioQueue.pop_front();
-        }
     }
 
     bool isQueueEmpty() const {

@@ -58,7 +58,13 @@ class SimOS
 
     void AddProcessToReadyQueue(PCB process){
         process.state = "Ready";
-        readyQueue.push_back(process.PID);
+
+        if (readyQueue.empty()){
+            AddProcessToCPU(process);
+        }
+        else {
+            readyQueue.push_back(process.PID);
+        }
     }
 
     void AddProcessToCPU(PCB process){
@@ -95,7 +101,8 @@ class SimOS
     }
 
     void DiskJobCompleted( int diskNumber ){
-        disks[diskNumber].DiskJobCompleted();
+        FileReadRequest IoQueue_Process = disks[diskNumber].DiskJobCompleted();
+        AddProcessToReadyQueue(IoQueue_Process.PID);
     }
 
     std::deque<int> GetReadyQueue( ){
