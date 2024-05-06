@@ -68,7 +68,12 @@ class SimOS
         }
     }
 
-    void AddProcessToCPU(PCB process){
+    void AddProcessToCPU(PCB process, int timerInterrupt = false){
+        // Remove PID from the ready queue
+        if (timerInterrupt){
+            readyQueue.pop_front();
+        }
+        
         process.state = "Running";
         currentPID = process.PID;
     }
@@ -132,6 +137,13 @@ class SimOS
 
         processTable[childProcess.PID] = childProcess;
         AddProcessToReadyQueue(childProcess);
+    }
+
+    void TimerInterrupt(){
+        PCB currentProcess = processTable[currentPID];
+        AddProcessToReadyQueue(currentProcess);
+        PCB nextProcess = readyQueue.front();
+        AddProcessToCPU(nextProcess, true);
     }
 
     // Getters

@@ -79,7 +79,6 @@ int main()
 		//std::cout << "Test on the line 66 fails!" << std::endl;
 	}
 
-	/*
 	sim.TimerInterrupt();
 	readyQueue = sim.GetReadyQueue();
 	if (sim.GetCPU() != 2 || readyQueue[0] != 1)
@@ -88,6 +87,7 @@ int main()
 		std::cout << "Test on the line 74 fails!" << std::endl;
 	}
 
+	/*
 	sim.SimExit();
 	readyQueue = sim.GetReadyQueue();
 	if (sim.GetCPU() != 1 || readyQueue.size() != 0)
