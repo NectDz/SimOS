@@ -57,10 +57,10 @@ class SimOS
         }
     }
 
-    void AddProcessToReadyQueue(PCB process){
+    void AddProcessToReadyQueue(PCB process, bool child = false){
         process.state = "Ready";
 
-        if (readyQueue.empty()){
+        if (readyQueue.empty() && !child){
             AddProcessToCPU(process);
         }
         else {
@@ -115,6 +115,25 @@ class SimOS
         return disks;
     }
 
+    void SimFork() {
+        /* # PID Method
+        PCB process = processTable[currentPID];
+        PCB newProcess = process;
+        newProcess.PID = lastPID + 1;
+        lastPID = newProcess.PID;
+        processTable[newProcess.PID] = newProcess;
+        AddProcessToReadyQueue(newProcess, true);
+        */
+
+       // PCB Method
+        PCB currentProcess = processTable[currentPID];
+        PCB childProcess = currentProcess.forkProcess();
+        lastPID = childProcess.PID;
+
+        processTable[childProcess.PID] = childProcess;
+        AddProcessToReadyQueue(childProcess, true);
+    }
+
     // Getters
     int getNumberOfDisks() const { return numberOfDisks; }
     
@@ -129,7 +148,7 @@ class SimOS
         int currentPID = NO_PROCESS;  
         int lastPID = 0 ;
 
-        std::unordered_map<int, PCB> processTable;
+        std::unordered_map<int, PCB> processTable; // Pros and Cons of using a map
 };
 
 
