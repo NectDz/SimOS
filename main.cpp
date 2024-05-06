@@ -79,7 +79,7 @@ int main()
 		allTestsClean = false;
 		std::cout << "Test on the line 66 fails!" << std::endl;
 	}
-
+	
 	sim.TimerInterrupt();
 	readyQueue = sim.GetReadyQueue();
 	if (sim.GetCPU() != 2 || readyQueue[0] != 1)

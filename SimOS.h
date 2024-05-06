@@ -7,6 +7,7 @@
 #include "PCB.h"
 #include "Disk.h"
 #include "FileReadRequest.h"
+#include <unordered_map>
 
 struct MemoryItem
 {
@@ -45,15 +46,15 @@ class SimOS
         // Create a new PCB object
         int PID = lastPID + 1;
         lastPID = PID; // Update last PID
-        PCB newProcess(PID); // Create a new PCB object into another array 
-        
+        PCB newPCB(PID);  // Create a new PCB with initialization
+        processTable[PID] = newPCB;  // Store the PCB in the process table
+
         if (currentPID == NO_PROCESS){
-            AddProcessToCPU(newProcess);
+            AddProcessToCPU(newPCB);
         }
         else {
-            AddProcessToReadyQueue(newProcess);
+            AddProcessToReadyQueue(newPCB);
         }
-
     }
 
     void AddProcessToReadyQueue(PCB process){
@@ -100,9 +101,10 @@ class SimOS
         return disks[diskNumber].getIOQueue();
     }
 
-    void DiskJobCompleted( int diskNumber ){
+    void DiskJobCompleted(int diskNumber) {
         FileReadRequest IoQueue_Process = disks[diskNumber].DiskJobCompleted();
-        AddProcessToReadyQueue(IoQueue_Process.PID);
+        PCB process = processTable[IoQueue_Process.PID];
+        AddProcessToReadyQueue(process);
     }
 
     std::deque<int> GetReadyQueue( ){
@@ -126,6 +128,8 @@ class SimOS
         std::vector<Disk> disks;
         int currentPID = NO_PROCESS;  
         int lastPID = 0 ;
+
+        std::unordered_map<int, PCB> processTable;
 };
 
 

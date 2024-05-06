@@ -9,9 +9,13 @@ public:
     int PID;                        
     std::string state;                      
     int programCounter;             
+    int fork = 1;
+
+    // Default Constructor
+    PCB() : PID(0), state("New"), programCounter(0), fork(0) {}
 
     // Constructor
-    PCB(int id) : PID(id), state("New"), programCounter(0) {}
+    PCB(int id, int fork=1) : PID(id), state("New"), programCounter(0), fork(fork) {}
 
 };
 
