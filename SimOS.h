@@ -57,10 +57,10 @@ class SimOS
         }
     }
 
-    void AddProcessToReadyQueue(PCB process, bool child = false){
+    void AddProcessToReadyQueue(PCB process){
         process.state = "Ready";
 
-        if (readyQueue.empty() && !child){
+        if (readyQueue.empty() && currentPID == NO_PROCESS){
             AddProcessToCPU(process);
         }
         else {
@@ -131,7 +131,7 @@ class SimOS
         lastPID = childProcess.PID;
 
         processTable[childProcess.PID] = childProcess;
-        AddProcessToReadyQueue(childProcess, true);
+        AddProcessToReadyQueue(childProcess);
     }
 
     // Getters
