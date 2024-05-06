@@ -28,6 +28,12 @@ public:
         return request;
     }
 
+    void DiskJobCompleted(){
+        if (!ioQueue.empty()) {
+            ioQueue.pop_front();
+        }
+    }
+
     bool isQueueEmpty() const {
         return ioQueue.empty();
     }

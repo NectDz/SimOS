@@ -94,6 +94,10 @@ class SimOS
         return disks[diskNumber].getIOQueue();
     }
 
+    void DiskJobCompleted( int diskNumber ){
+        disks[diskNumber].DiskJobCompleted();
+    }
+
     std::deque<int> GetReadyQueue( ){
         return readyQueue;
     }
