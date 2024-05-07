@@ -87,7 +87,7 @@ int main()
 		std::cout << "Test on the line 74 fails!" << std::endl;
 	}
 
-	/*
+	
 	sim.SimExit();
 	readyQueue = sim.GetReadyQueue();
 	if (sim.GetCPU() != 1 || readyQueue.size() != 0)
@@ -95,7 +95,7 @@ int main()
 		allTestsClean = false;
 		std::cout << "Test on the line 82 fails!" << std::endl;
 	}
-
+	/*
 	sim.AccessMemoryAddress(140);
 	MemoryUsage ram{ sim.GetMemory() };
 	if (ram[0].PageNumber != 14 || ram[0].PID != 1)

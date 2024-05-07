@@ -146,6 +146,16 @@ class SimOS
         AddProcessToCPU(nextProcess, true);
     }
 
+    void SimExit(){
+        PCB currentProcess = processTable[currentPID];
+        currentProcess.state = "Terminated";
+        processTable[currentPID] = currentProcess;
+        
+        // Advances the next process in the ready queue
+        PCB nextProcess = readyQueue.front();
+        AddProcessToCPU(nextProcess, true);
+    }
+
     // Getters
     int getNumberOfDisks() const { return numberOfDisks; }
     
