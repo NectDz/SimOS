@@ -161,6 +161,15 @@ class SimOS
             // Advances the next process in the ready queue
             PCB nextProcess = readyQueue.front();
             AddProcessToCPU(nextProcess, true);
+        } else {
+            // Current process is terminated
+            currentProcess.state = "Terminated";
+            processTable[currentPID] = currentProcess;
+
+            // Advances the next process in the ready queue
+            PCB nextProcess = readyQueue.front();
+            AddProcessToCPU(nextProcess, true);
+        
         }
 
     }
