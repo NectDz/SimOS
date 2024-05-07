@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+constexpr int NO_PARENT{ 0 };
+
 class PCB {
 public:
     int PID;                        
@@ -11,7 +13,7 @@ public:
     int programCounter;             
     int fork = 1;
     std::vector<PCB> children;
-    int parentPID;
+    int parentPID = NO_PARENT;
     // Default Constructor
     PCB() : PID(0), state("New"), programCounter(0), fork(0) {}
 
@@ -31,6 +33,15 @@ public:
 
         return child;
     }
+
+    int getParentID() const {
+        return parentPID;
+    }
+
+    std::string getState() const {
+        return state;
+    }
+
 };
 
 #endif
