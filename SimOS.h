@@ -146,7 +146,7 @@ class SimOS
         AddProcessToCPU(nextProcess, true);
     }
 
-    void SimExit(){
+    void SimExit(){ // Add Parent PID
         PCB currentProcess = processTable[currentPID];
         currentProcess.state = "Terminated";
         processTable[currentPID] = currentProcess;
