@@ -181,7 +181,6 @@ class SimOS
         unsigned long long pageNumber = address / pageSize;
         unsigned long long frameNumber = pageNumber % maxFrames;
 
-        std:: cout<< "Page Number: " << pageNumber << " Frame Number: " << frameNumber << " CurrentPID: " << currentPID << std::endl;
         memoryUsage.push_back(MemoryItem{pageNumber, frameNumber, currentPID});
     }
 
