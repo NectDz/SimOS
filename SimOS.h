@@ -28,6 +28,13 @@ class SimOS
         this->amountOfRAM = amountOfRAM;
         this->pageSize = pageSize;
 
+        // Calculate the number of frames in RAM
+        maxFrames = amountOfRAM / pageSize;
+
+        // Initialize the Memory Usage vector
+        memoryUsage.assign(maxFrames, MemoryItem());
+        memoryUsage.resize(maxFrames);
+
         CreateDisks(numberOfDisks);
     }
 
@@ -174,6 +181,10 @@ class SimOS
 
     }
 
+    void AccessMemoryAddress(unsigned long long address){
+        
+    }
+
     // Getters
     int getNumberOfDisks() const { return numberOfDisks; }
     
@@ -183,6 +194,10 @@ class SimOS
         int numberOfDisks;
         unsigned long long amountOfRAM;
         unsigned int pageSize;
+
+        int maxFrames; 
+        std::vector<MemoryItem> memoryUsage;
+
         std::deque<int> readyQueue; 
         std::vector<Disk> disks;
         int currentPID = NO_PROCESS;  
