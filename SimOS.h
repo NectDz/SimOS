@@ -154,28 +154,42 @@ class SimOS
 
         PCB parentProcess = processTable[currentProcess.getParentID()];
 
-        if (parentProcess.getState() == "Waiting"){
-            currentProcess.state = "Terminated";
-            AddProcessToReadyQueue(parentProcess);
+        auto it = memoryUsage.begin();
+        while (it != memoryUsage.end()) {
+        if (it->PID == currentPID) {
+            memoryUsage.erase(it);
+            break;  
+        }
+            ++it;
+        }
 
-            PCB nextProcess = readyQueue.front();
-            AddProcessToCPU(nextProcess, true);
-        } else {
+        if (this->GetReadyQueue().size() == 0){
             currentProcess.state = "Terminated";
             processTable[currentPID] = currentProcess;
+            currentPID = NO_PROCESS;
+        } else { 
 
-            PCB nextProcess = readyQueue.front();
-            AddProcessToCPU(nextProcess, true);
+            if (parentProcess.getState() == "Waiting"){
+                currentProcess.state = "Terminated";
+                AddProcessToReadyQueue(parentProcess);
+
+                PCB nextProcess = readyQueue.front();
+                AddProcessToCPU(nextProcess, true);
+            } else {
+                currentProcess.state = "Terminated";
+                processTable[currentPID] = currentProcess;
+
+                PCB nextProcess = readyQueue.front();
+                AddProcessToCPU(nextProcess, true);
+            }
         }
 
     }
 
-    void Wait(){
+    void SimWait(){
         // Current Process State is changed to Waiting
         PCB currentProcess = processTable[currentPID];
         currentProcess.state = "Waiting";
-
-
     }
 
     void AccessMemoryAddress(unsigned long long address){

@@ -103,7 +103,7 @@ int main()
 		allTestsClean = false;
 		std::cout << "Test on the line 90 fails!" << std::endl;
 	}
-	/*
+	
 	sim.SimWait();
 	if (sim.GetCPU() != 1)
 	{
@@ -113,11 +113,11 @@ int main()
 
 	sim.SimExit();
 	ram = sim.GetMemory();
-	if (sim.GetCPU() != NO_PROCESS || ram.size() != 0)
+	if (sim.GetCPU() != 0 || ram.size() != 0)
 	{
 		allTestsClean = false;
-		std::cout << "Test on the line 105 fails!" << std::endl;
-	}*/
+		std::cout << "GetCPU: " << sim.GetCPU() << std::endl;
+	}
 
 
     if (allTestsClean)
