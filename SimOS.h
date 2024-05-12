@@ -152,28 +152,29 @@ class SimOS
     void SimExit(){ // Implement Cascading Termination
         PCB currentProcess = processTable[currentPID];
 
-        if (currentProcess.getState() == "Waiting" && currentProcess.getParentID() != NO_PARENT){
-            // Add the parent process to the ready queue
-            PCB parentProcess = processTable[currentProcess.getParentID()];
+        PCB parentProcess = processTable[currentProcess.getParentID()];
+
+        if (parentProcess.getState() == "Waiting"){
+            currentProcess.state = "Terminated";
             AddProcessToReadyQueue(parentProcess);
 
-            // Current process is terminated
-            currentProcess.state = "Terminated";
-            processTable[currentPID] = currentProcess;
-
-            // Advances the next process in the ready queue
             PCB nextProcess = readyQueue.front();
             AddProcessToCPU(nextProcess, true);
         } else {
-            // Current process is terminated
             currentProcess.state = "Terminated";
             processTable[currentPID] = currentProcess;
 
-            // Advances the next process in the ready queue
             PCB nextProcess = readyQueue.front();
             AddProcessToCPU(nextProcess, true);
-        
         }
+
+    }
+
+    void Wait(){
+        // Current Process State is changed to Waiting
+        PCB currentProcess = processTable[currentPID];
+        currentProcess.state = "Waiting";
+
 
     }
 
