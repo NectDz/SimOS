@@ -94,7 +94,7 @@ class SimOS
         }
         
         // If Disk number doesnt exist through std::out_of_range exception
-        if (diskNumber >= disks.size() || diskNumber < 0){
+        if (diskNumber >= static_cast<int>(disks.size()) || diskNumber < 0){
             throw std::out_of_range("");
         }
 
