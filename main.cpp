@@ -119,7 +119,6 @@ int main()
 		std::cout << "GetCPU: " << sim.GetCPU() << std::endl;
 	}
 
-
     if (allTestsClean)
     {
         std::cout << "All tests passed!" << std::endl;

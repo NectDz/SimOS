@@ -89,7 +89,11 @@ class SimOS
     void DiskReadRequest( int diskNumber, std::string fileName ){
         // Look up PCB using PID and change the state to waiting
 
+        if (currentPID == NO_PROCESS) {
+            throw std::logic_error("");
+        }
         // Add the process to the IO queue
+    
         disks[diskNumber].addRequest(FileReadRequest{currentPID, fileName});
 
         // Change the currentPID to NO_PROCESS || # Might need to change this to the next process in the ready queue
@@ -134,6 +138,10 @@ class SimOS
         */
 
        // PCB Method
+
+        if (currentPID == NO_PROCESS) {
+            throw std::logic_error("");
+        }
         PCB currentProcess = processTable[currentPID];
         PCB childProcess = currentProcess.forkProcess();
         lastPID = childProcess.PID;
@@ -143,6 +151,10 @@ class SimOS
     }
 
     void TimerInterrupt(){
+        if (currentPID == NO_PROCESS) {
+            throw std::logic_error("");
+        }
+        
         PCB currentProcess = processTable[currentPID];
         AddProcessToReadyQueue(currentProcess);
         PCB nextProcess = readyQueue.front();
@@ -150,6 +162,10 @@ class SimOS
     }
 
     void SimExit(){ // Implement Cascading Termination
+        if (currentPID == NO_PROCESS) {
+            throw std::logic_error("");
+        }
+
         PCB currentProcess = processTable[currentPID];
 
         PCB parentProcess = processTable[currentProcess.getParentID()];
@@ -187,6 +203,9 @@ class SimOS
     }
 
     void SimWait(){
+        if (currentPID == NO_PROCESS) {
+            throw std::logic_error("");
+        }
         // Current Process State is changed to Waiting
         PCB currentProcess = processTable[currentPID];
         currentProcess.state = "Waiting";
