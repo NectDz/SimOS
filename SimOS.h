@@ -92,6 +92,12 @@ class SimOS
         if (currentPID == NO_PROCESS) {
             throw std::logic_error("");
         }
+        
+        // If Disk number doesnt exist through std::out_of_range exception
+        if (diskNumber >= disks.size() || diskNumber < 0){
+            throw std::out_of_range("");
+        }
+
         // Add the process to the IO queue
     
         disks[diskNumber].addRequest(FileReadRequest{currentPID, fileName});
@@ -154,7 +160,7 @@ class SimOS
         if (currentPID == NO_PROCESS) {
             throw std::logic_error("");
         }
-        
+
         PCB currentProcess = processTable[currentPID];
         AddProcessToReadyQueue(currentProcess);
         PCB nextProcess = readyQueue.front();
