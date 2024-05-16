@@ -165,7 +165,7 @@ class SimOS
         PCB &currentProcess = processTable[currentPID];
         AddProcessToReadyQueue(currentProcess);
         PCB &nextProcess = processTable[readyQueue.front()];
-        AddProcessToCPU(nextProcess, true);
+        AddProcessToCPU(nextProcess, true); // Add New Process Test Case
     }
 
     void SimExit(){ // Implement Cascading Termination
@@ -183,12 +183,13 @@ class SimOS
                 it = memoryUsage.erase(it); 
             } else {
                 ++it;
-            }
+        }
 }
-        if (this->GetReadyQueue().size() == 0){
+        if (this->GetReadyQueue().size() == 0){ // Do a test case
             currentProcess.state = "Terminated";
             processTable[currentPID] = currentProcess;
             currentPID = NO_PROCESS;
+            return;
         } else { 
 
             if (parentProcess.getState() == "Waiting"){
@@ -198,18 +199,16 @@ class SimOS
                 processTable[currentPID] = currentProcess;
                 AddProcessToReadyQueue(parentProcess);
 
-                PCB &nextProcess = processTable[readyQueue.front()];
-                AddProcessToCPU(nextProcess, true);
             } else {
                 currentProcess.state = "Terminated";
                 parentProcess.changeChildState(currentProcess.PID, "Terminated");
                 processTable[parentProcess.PID] = parentProcess;
                 processTable[currentPID] = currentProcess;
 
-                PCB &nextProcess = processTable[readyQueue.front()];
-                AddProcessToCPU(nextProcess, true);
             }
         }
+
+        nextProcess();
 
     }
 
@@ -245,12 +244,17 @@ class SimOS
             currentProcess.state = "Waiting";
             processTable[currentPID] = currentProcess;
 
-            PCB &nextProcess = processTable[readyQueue.front()];
-            readyQueue.pop_front();
-
-            AddProcessToCPU(nextProcess, true);
+            nextProcess();
         }
 
+    }
+
+    void nextProcess() {
+        if (!readyQueue.empty()) {
+            PCB &nextProcess = processTable[readyQueue.front()];
+            readyQueue.pop_front();
+            AddProcessToCPU(nextProcess, true);
+        }
     }
 
     void AccessMemoryAddress(unsigned long long address){
