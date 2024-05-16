@@ -79,6 +79,8 @@ class SimOS
         }
         
         process.state = "Running";
+        processTable[process.PID] = process;
+        
         currentPID = process.PID;
     }
 
