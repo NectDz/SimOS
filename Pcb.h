@@ -37,7 +37,7 @@ public:
         PCB child = *this; 
         child.PID = PID + 1;
         child.fork = 0; 
-        child.parentPID = PID;
+        child.parentPID = this->PID; 
         children.push_back(child); 
 
         return child;
@@ -49,6 +49,15 @@ public:
 
     std::string getState() const {
         return state;
+    }
+
+    void changeChildState(int childPID, const std::string newState) {
+        for (PCB &child : children) {
+            if (child.PID == childPID) {
+                child.state = newState;
+                break;
+            }
+        }
     }
 
 };

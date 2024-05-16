@@ -60,22 +60,21 @@ class SimOS
         }
     }
 
-    void AddProcessToReadyQueue(PCB process){
-        process.state = "Ready";
-        processTable[process.PID] = process;
-        
+    void AddProcessToReadyQueue(PCB &process){
+        PCB &readyProcess = processTable[process.PID];
+        readyProcess.state = "Ready";
 
         if (readyQueue.empty() && currentPID == NO_PROCESS){
-            AddProcessToCPU(process);
+            AddProcessToCPU(readyProcess);
         }
         else {
-            readyQueue.push_back(process.PID);
+            readyQueue.push_back(readyProcess.PID);
         }
     }
 
-    void AddProcessToCPU(PCB process, int timerInterrupt = false){
+    void AddProcessToCPU(PCB &process, int timerInterrupt = false){
         // Remove PID from the ready queue
-        if (timerInterrupt){
+        if (timerInterrupt && !readyQueue.empty()){
             readyQueue.pop_front();
         }
         
@@ -83,7 +82,7 @@ class SimOS
         currentPID = process.PID;
     }
 
-    int GetCPU(){
+    int GetCPU() const{
         return currentPID;
     }
 
@@ -150,7 +149,7 @@ class SimOS
         if (currentPID == NO_PROCESS) {
             throw std::logic_error("");
         }
-        PCB currentProcess = processTable[currentPID];
+        PCB &currentProcess = processTable[currentPID];
         PCB childProcess = currentProcess.forkProcess();
         lastPID = childProcess.PID;
 
@@ -163,9 +162,9 @@ class SimOS
             throw std::logic_error("");
         }
 
-        PCB currentProcess = processTable[currentPID];
+        PCB &currentProcess = processTable[currentPID];
         AddProcessToReadyQueue(currentProcess);
-        PCB nextProcess = readyQueue.front();
+        PCB &nextProcess = processTable[readyQueue.front()];
         AddProcessToCPU(nextProcess, true);
     }
 
@@ -174,9 +173,9 @@ class SimOS
             throw std::logic_error("");
         }
 
-        PCB currentProcess = processTable[currentPID];
+        PCB &currentProcess = processTable[currentPID];
 
-        PCB parentProcess = processTable[currentProcess.getParentID()];
+        PCB &parentProcess = processTable[currentProcess.getParentID()];
 
         auto it = memoryUsage.begin();
         while (it != memoryUsage.end()) {
@@ -195,15 +194,20 @@ class SimOS
 
             if (parentProcess.getState() == "Waiting"){
                 currentProcess.state = "Terminated";
+                parentProcess.changeChildState(currentProcess.PID, "Terminated");
+
+                processTable[currentPID] = currentProcess;
                 AddProcessToReadyQueue(parentProcess);
 
-                PCB nextProcess = readyQueue.front();
+                PCB &nextProcess = processTable[readyQueue.front()];
                 AddProcessToCPU(nextProcess, true);
             } else {
                 currentProcess.state = "Terminated";
+                parentProcess.changeChildState(currentProcess.PID, "Terminated");
+                processTable[parentProcess.PID] = parentProcess;
                 processTable[currentPID] = currentProcess;
 
-                PCB nextProcess = readyQueue.front();
+                PCB &nextProcess = processTable[readyQueue.front()];
                 AddProcessToCPU(nextProcess, true);
             }
         }
@@ -215,8 +219,10 @@ class SimOS
             throw std::logic_error("");
         }
 
-        PCB currentProcess = processTable[currentPID];
+        PCB &currentProcess = processTable[currentPID];
         std::vector<PCB> childProcesses = currentProcess.getChildren();
+
+        // Children size
 
         if (childProcesses.empty()){
             return;
@@ -239,10 +245,12 @@ class SimOS
         if (!zombie){
             currentProcess.state = "Waiting";
             processTable[currentPID] = currentProcess;
-        }
 
-        PCB nextProcess = readyQueue.front();
-        AddProcessToCPU(nextProcess, true);
+            PCB &nextProcess = processTable[readyQueue.front()];
+            readyQueue.pop_front();
+
+            AddProcessToCPU(nextProcess, true);
+        }
 
     }
 
@@ -253,9 +261,6 @@ class SimOS
         memoryUsage.push_back(MemoryItem{pageNumber, frameNumber, currentPID});
     }
     
-    void nextProcess(){
-        AddProcessToCPU(readyQueue.front(), true);
-    }
 
     MemoryUsage GetMemory(){
         return memoryUsage;
