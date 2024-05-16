@@ -216,13 +216,12 @@ class SimOS
         }
 
         PCB currentProcess = processTable[currentPID];
+        std::vector<PCB> childProcesses = currentProcess.getChildren();
 
-        if (currentProcess.getChildren().empty()){
+        if (childProcesses.empty()){
             return;
         }
-
-        // Check for Zombies
-        std::vector<PCB> childProcesses = currentProcess.getChildren();
+        
         bool zombie = false; 
 
         for (auto child : childProcesses){
