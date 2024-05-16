@@ -179,13 +179,12 @@ class SimOS
 
         auto it = memoryUsage.begin();
         while (it != memoryUsage.end()) {
-        if (it->PID == currentPID) {
-            memoryUsage.erase(it);
-            break;  
-        }
-            ++it;
-        }
-
+            if (it->PID == currentPID) {
+                it = memoryUsage.erase(it); 
+            } else {
+                ++it;
+            }
+}
         if (this->GetReadyQueue().size() == 0){
             currentProcess.state = "Terminated";
             processTable[currentPID] = currentProcess;
