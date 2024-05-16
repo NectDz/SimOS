@@ -62,6 +62,8 @@ class SimOS
 
     void AddProcessToReadyQueue(PCB process){
         process.state = "Ready";
+        processTable[process.PID] = process;
+        
 
         if (readyQueue.empty() && currentPID == NO_PROCESS){
             AddProcessToCPU(process);
@@ -212,9 +214,37 @@ class SimOS
         if (currentPID == NO_PROCESS) {
             throw std::logic_error("");
         }
-        // Current Process State is changed to Waiting
+
         PCB currentProcess = processTable[currentPID];
-        currentProcess.state = "Waiting";
+
+        if (currentProcess.getChildren().empty()){
+            return;
+        }
+
+        // Check for Zombies
+        std::vector<PCB> childProcesses = currentProcess.getChildren();
+        bool zombie = false; 
+
+        for (auto child : childProcesses){
+            if (child.getState() == "Terminated"){
+                currentProcess.deleteChildProcess(child.PID);
+                processTable.erase(child.PID);
+
+                currentProcess.state = "Running";
+                processTable[currentPID] = currentProcess;
+                zombie = true;
+                break;
+            }
+        }
+        
+        if (!zombie){
+            currentProcess.state = "Waiting";
+            processTable[currentPID] = currentProcess;
+        }
+
+        PCB nextProcess = readyQueue.front();
+        AddProcessToCPU(nextProcess, true);
+
     }
 
     void AccessMemoryAddress(unsigned long long address){
@@ -222,6 +252,10 @@ class SimOS
         unsigned long long frameNumber = pageNumber % maxFrames;
 
         memoryUsage.push_back(MemoryItem{pageNumber, frameNumber, currentPID});
+    }
+    
+    void nextProcess(){
+        AddProcessToCPU(readyQueue.front(), true);
     }
 
     MemoryUsage GetMemory(){

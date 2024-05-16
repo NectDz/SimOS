@@ -24,6 +24,15 @@ public:
         return children;
     }
 
+    void deleteChildProcess(int PID) {
+        for (size_t i = 0; i < children.size(); i++) {
+            if (children[i].PID == PID) {
+                children.erase(children.begin() + i);
+                break;
+            }
+        }
+    }
+
     PCB forkProcess() {
         PCB child = *this; 
         child.PID = PID + 1;
