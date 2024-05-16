@@ -260,6 +260,10 @@ class SimOS
     }
 
     void AccessMemoryAddress(unsigned long long address){
+        if (currentPID == NO_PROCESS) {
+            throw std::logic_error("No process is currently using the CPU.");
+        }
+
         unsigned long long pageNumber = address / pageSize;
         unsigned long long frameNumber = memoryUsage.size();
 
