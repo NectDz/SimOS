@@ -80,7 +80,7 @@ class SimOS
         
         process.state = "Running";
         processTable[process.PID] = process;
-        
+
         currentPID = process.PID;
     }
 
@@ -261,7 +261,7 @@ class SimOS
 
     void AccessMemoryAddress(unsigned long long address){
         unsigned long long pageNumber = address / pageSize;
-        unsigned long long frameNumber = pageNumber % maxFrames;
+        unsigned long long frameNumber = memoryUsage.size();
 
         memoryUsage.push_back(MemoryItem{pageNumber, frameNumber, currentPID});
     }
