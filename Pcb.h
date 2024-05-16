@@ -11,14 +11,13 @@ public:
     int PID;                        
     std::string state;                      
     int programCounter;             
-    int fork = 1;
     std::vector<PCB> children;
     int parentPID = NO_PARENT;
     // Default Constructor
-    PCB() : PID(0), state("New"), programCounter(0), fork(0) {}
+    PCB() : PID(0), state("New"), programCounter(0) {}
 
     // Constructor
-    PCB(int id, int fork=1) : PID(id), state("New"), programCounter(0), fork(fork) {}
+    PCB(int id, int fork=1) : PID(id), state("New"), programCounter(0) {}
 
     std::vector<PCB> getChildren() const {
         return children;
@@ -36,7 +35,6 @@ public:
     PCB forkProcess() {
         PCB child = *this; 
         child.PID = PID + 1;
-        child.fork = 0; 
         child.parentPID = this->PID; 
         children.push_back(child); 
 
