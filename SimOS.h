@@ -284,7 +284,7 @@ class SimOS
         int currentPID = NO_PROCESS;  
         int lastPID = 0 ;
 
-        std::unordered_map<int, PCB> processTable; // Pros and Cons of using a map
+        std::unordered_map<int, PCB> processTable; 
 };
 
 
