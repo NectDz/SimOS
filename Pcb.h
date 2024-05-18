@@ -1,3 +1,5 @@
+// Kevin Granados
+
 #ifndef PCB_H
 #define PCB_H
 
@@ -17,7 +19,7 @@ public:
     PCB() : PID(0), state("New"), programCounter(0) {}
 
     // Constructor
-    PCB(int id, int fork=1) : PID(id), state("New"), programCounter(0) {}
+    PCB(int id) : PID(id), state("New"), programCounter(0) {}
 
     std::vector<PCB> getChildren() const {
         return children;

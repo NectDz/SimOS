@@ -1,3 +1,5 @@
+// Kevin Granados
+
 #ifndef DISK_H
 #define DISK_H
 
@@ -41,7 +43,11 @@ public:
     }
 
     std::deque<FileReadRequest> getIOQueue() const {
-        return ioQueue;
+        std::deque<FileReadRequest> copy = ioQueue;
+        if (!copy.empty()) {
+            copy.pop_front();
+        }
+        return copy;
     }
 };
 

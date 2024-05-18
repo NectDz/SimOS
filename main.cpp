@@ -1,63 +1,38 @@
 #include"SimOS.h"
 #include<deque>
-#include <iostream> 
 
 int main()
 {
 	SimOS sim{ 3, 1000, 10 };
+	bool allTestsClean{ true };
 
-    bool allTestsClean = true;
+	if (sim.GetCPU() != NO_PROCESS)
+	{
+		allTestsClean = false;
+		std::cout << "Test on the line 9 fails!" << std::endl;
+	}
 
-    // @Test NewProcess and Ready Queue
-    sim.NewProcess();
-
-    std::cout << std::endl;
-
+	sim.NewProcess();
 	if (sim.GetCPU() != 1)
 	{
 		allTestsClean = false;
-		std::cout << "Get CPU Fail" << std::endl;
+		std::cout << "Test on the line 16 fails!" << std::endl;
 	}
-
-    std::deque<int> readyQueue{ sim.GetReadyQueue() };
-	if (readyQueue.size() != 0)
-	{
-		allTestsClean = false;
-		std::cout << "Get Ready Queue Fail" << std::endl;
-	}
-
-    // Display Disks from Vector
-    
-    std::vector<Disk> disks = sim.GetDisks();
-    if (disks.size() != 3)
-    {
-        allTestsClean = false;
-        std::cout << "Get Disk Count Fail" << std::endl;
-    }   
 
 	sim.DiskReadRequest(0, "file1.txt");
 	if (sim.GetCPU() != NO_PROCESS)
 	{
 		allTestsClean = false;
-		std::cout << "DiskReadRequest Test Fail" << std::endl;
+		std::cout << "Test on the line 23 fails!" << std::endl;
 	}
 
 	FileReadRequest request{ sim.GetDisk(0) };
 	if (request.PID != 1 || request.fileName != "file1.txt")
 	{
 		allTestsClean = false;
-		std::cout << "GetDisk Test fails" << std::endl;
+		std::cout << "Test on the line 30 fails!" << std::endl;
 	}
 
-	sim.DiskJobCompleted(0);
-	request = sim.GetDisk(0);
-	if (request.PID != NO_PROCESS || request.fileName != "")
-	{
-		allTestsClean = false;
-		std::cout << "DiskJobCompleted Test fails!" << std::endl;
-	}
-
-	// Go Back to this test case
 	std::deque<FileReadRequest> ioQueue0{ sim.GetDiskQueue(0) };
 	if (ioQueue0.size() != 0)
 	{
@@ -65,10 +40,25 @@ int main()
 		std::cout << "Test on the line 37 fails!" << std::endl;
 	}
 
+	sim.DiskJobCompleted(0);
+	request = sim.GetDisk(0);
+	if (request.PID != NO_PROCESS || request.fileName != "")
+	{
+		allTestsClean = false;
+		std::cout << "Test on the line 45 fails!" << std::endl;
+	}
+
 	if (sim.GetCPU() != 1)
 	{
 		allTestsClean = false;
-		std::cout << "GetCPU on the line 70 fails!" << std::endl;
+		std::cout << "Test on the line 51 fails!" << std::endl;
+	}
+
+	std::deque<int> readyQueue{ sim.GetReadyQueue() };
+	if (readyQueue.size() != 0)
+	{
+		allTestsClean = false;
+		std::cout << "Test on the line 58 fails!" << std::endl;
 	}
 
 	sim.SimFork();
@@ -87,7 +77,6 @@ int main()
 		std::cout << "Test on the line 74 fails!" << std::endl;
 	}
 
-	
 	sim.SimExit();
 	readyQueue = sim.GetReadyQueue();
 	if (sim.GetCPU() != 1 || readyQueue.size() != 0)
@@ -95,7 +84,7 @@ int main()
 		allTestsClean = false;
 		std::cout << "Test on the line 82 fails!" << std::endl;
 	}
-	
+
 	sim.AccessMemoryAddress(140);
 	MemoryUsage ram{ sim.GetMemory() };
 	if (ram[0].pageNumber != 14 || ram[0].PID != 1)
@@ -103,7 +92,7 @@ int main()
 		allTestsClean = false;
 		std::cout << "Test on the line 90 fails!" << std::endl;
 	}
-	
+
 	sim.SimWait();
 	if (sim.GetCPU() != 1)
 	{
@@ -113,16 +102,14 @@ int main()
 
 	sim.SimExit();
 	ram = sim.GetMemory();
-	if (sim.GetCPU() != 0 || ram.size() != 0)
+	if (sim.GetCPU() != NO_PROCESS || ram.size() != 0)
 	{
 		allTestsClean = false;
-		std::cout << "GetCPU: " << sim.GetCPU() << std::endl;
+		std::cout << "Test on the line 105 fails!" << std::endl;
 	}
 
-    if (allTestsClean)
-    {
-        std::cout << "All tests passed!" << std::endl;
-    }
+	if (allTestsClean)
+		std::cout << "These preliminary tests are passed" << std::endl;
 
 	return 0;
 }

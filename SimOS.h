@@ -1,3 +1,5 @@
+// Kevin Granados
+
 #ifndef SIM_OS_H
 #define SIM_OS_H
 
@@ -103,12 +105,10 @@ class SimOS
 
         // Add the process to the IO queue
     
-        disks[diskNumber].addRequest(FileReadRequest{currentPID, fileName});
+        disks[diskNumber].addRequest(FileReadRequest{currentPID, fileName});\
 
-        // Change the currentPID to NO_PROCESS || # Might need to change this to the next process in the ready queue
-        currentPID = NO_PROCESS;
+        nextProcess();
     }
-
 
     FileReadRequest GetDisk( int diskNumber ){
         if (disks[diskNumber].isQueueEmpty()){
@@ -256,6 +256,8 @@ class SimOS
             PCB &nextProcess = processTable[readyQueue.front()];
             readyQueue.pop_front();
             AddProcessToCPU(nextProcess, true);
+        } else {
+            currentPID = NO_PROCESS;
         }
     }
 
