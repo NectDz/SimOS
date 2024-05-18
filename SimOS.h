@@ -223,7 +223,6 @@ class SimOS
         
         if (!zombie){
             currentProcess.state = "Waiting";
-            processTable[currentPID] = currentProcess;
 
             nextProcess();
         }
