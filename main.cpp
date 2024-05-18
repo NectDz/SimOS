@@ -2,7 +2,8 @@
 #include<deque>
 
 int main()
-{
+{	
+	
 	SimOS sim{ 3, 1000, 10 };
 	bool allTestsClean{ true };
 
@@ -108,8 +109,37 @@ int main()
 		std::cout << "Test on the line 105 fails!" << std::endl;
 	}
 
-	if (allTestsClean)
-		std::cout << "These preliminary tests are passed" << std::endl;
+
+	if (allTestsClean){
+		std::cout << "Shostak test passed" << std::endl;
+	}
+
+
+	/*
+	SimOS sim2{ 3, 1000, 10 };
+	bool allTestsClean2{ true };
+
+	sim2.NewProcess(); // Pid 1 
+	sim2.SimFork(); // Pid 2
+	sim2.TimerInterrupt(); // Pid 1
+	sim2.SimFork(); // Pid 3
+	sim2.TimerInterrupt(); // Pid 2
+	sim2.SimFork(); // Pid 4
+	sim2.TimerInterrupt(); 
+	sim2.TimerInterrupt();
+	sim2.TimerInterrupt(); 
+
+	std::cout << "1. Ready Queue Size: " << sim2.GetReadyQueue().size() << std::endl;
+	sim2.SimExit(); 
+	std::cout << "CPU: " << sim2.GetCPU() << std::endl;
+	std::cout << "2. Ready Queue Size: " << sim2.GetReadyQueue().size() << std::endl;
+
+	// Loop through the ready queue
+	std::deque<int> readyQueue = sim2.GetReadyQueue();
+	for (int i = 0; i < readyQueue.size(); i++) {
+		std::cout << "Ready Queue PID: " << readyQueue[i] << std::endl;
+	}
+	*/
 
 	return 0;
 }

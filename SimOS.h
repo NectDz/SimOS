@@ -144,8 +144,8 @@ class SimOS
             throw std::logic_error("");
         }
         PCB &currentProcess = processTable[currentPID];
-        PCB childProcess = currentProcess.forkProcess();
-        lastPID = childProcess.PID;
+        lastPID++;
+        PCB childProcess = currentProcess.forkProcess(lastPID);
 
         processTable[childProcess.PID] = childProcess;
         AddProcessToReadyQueue(childProcess);
@@ -170,6 +170,9 @@ class SimOS
         PCB &currentProcess = processTable[currentPID];
         PCB &parentProcess = processTable[currentProcess.getParentID()];
 
+
+        cascadeTermination(currentPID);
+
         auto it = memoryUsage.begin();
         while (it != memoryUsage.end()) {
             if (it->PID == currentPID) {
@@ -187,10 +190,39 @@ class SimOS
         } else {
             currentProcess.state = "Terminated";
             parentProcess.changeChildState(currentProcess.PID, "Terminated");
-            }
-
+        }
+        
         nextProcess();
+    }
 
+    void cascadeTermination(int pid) {
+        PCB &process = processTable[pid];
+        std::vector<PCB> children = process.getChildren();
+        std::cout<< "Terminating process " << pid << std::endl;
+
+         // Terminate the current process
+        process.state = "Terminated";
+
+        // Remove from process table
+        processTable.erase(pid);
+
+        // Remove from memory usage
+        auto it = memoryUsage.begin();
+        while (it != memoryUsage.end()) {
+            if (it->PID == pid) {
+                it = memoryUsage.erase(it);
+            } else {
+                ++it;
+            }
+        }
+
+        // Recursively terminate child processes
+        for (PCB &child : children) {
+            std::cout<< "Terminating process " << child.PID << std::endl;
+            cascadeTermination(child.PID);
+        }
+
+    
     }
 
     void SimWait(){
