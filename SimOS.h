@@ -81,7 +81,6 @@ class SimOS
         }
         
         process.state = "Running";
-        processTable[process.PID] = process;
 
         currentPID = process.PID;
     }
@@ -95,8 +94,7 @@ class SimOS
         // Look up PCB using PID and change the state to waiting
 
         PCB &currentProcess = processTable[currentPID];
-        currentProcess.state = "Waiting";
-        processTable[currentPID] = currentProcess;
+        currentProcess.state = "Waiting";  
 
         if (currentPID == NO_PROCESS) {
             throw std::logic_error("");
@@ -129,7 +127,7 @@ class SimOS
 
     void DiskJobCompleted(int diskNumber) {
         FileReadRequest IoQueue_Process = disks[diskNumber].DiskJobCompleted();
-        PCB process = processTable[IoQueue_Process.PID];
+        PCB &process = processTable[IoQueue_Process.PID];
         AddProcessToReadyQueue(process);
     }
 
@@ -170,7 +168,6 @@ class SimOS
         }
 
         PCB &currentProcess = processTable[currentPID];
-
         PCB &parentProcess = processTable[currentProcess.getParentID()];
 
         auto it = memoryUsage.begin();
@@ -183,7 +180,6 @@ class SimOS
 }
         if (this->GetReadyQueue().size() == 0){ // Do a test case
             currentProcess.state = "Terminated";
-            processTable[currentPID] = currentProcess;
             currentPID = NO_PROCESS;
             return;
         } else { 
@@ -192,15 +188,10 @@ class SimOS
                 currentProcess.state = "Terminated";
                 parentProcess.changeChildState(currentProcess.PID, "Terminated");
 
-                processTable[currentPID] = currentProcess;
                 AddProcessToReadyQueue(parentProcess);
-
             } else {
                 currentProcess.state = "Terminated";
                 parentProcess.changeChildState(currentProcess.PID, "Terminated");
-                processTable[parentProcess.PID] = parentProcess;
-                processTable[currentPID] = currentProcess;
-
             }
         }
 
@@ -267,7 +258,7 @@ class SimOS
     }
     
 
-    MemoryUsage GetMemory(){
+    MemoryUsage GetMemory() const{
         return memoryUsage;
     }
 
