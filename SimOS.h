@@ -176,24 +176,18 @@ class SimOS
                 it = memoryUsage.erase(it); 
             } else {
                 ++it;
-        }
-}
-        if (this->GetReadyQueue().size() == 0){ // Do a test case
-            currentProcess.state = "Terminated";
-            currentPID = NO_PROCESS;
-            return;
-        } else { 
-
-            if (parentProcess.getState() == "Waiting"){
-                currentProcess.state = "Terminated";
-                parentProcess.changeChildState(currentProcess.PID, "Terminated");
-
-                AddProcessToReadyQueue(parentProcess);
-            } else {
-                currentProcess.state = "Terminated";
-                parentProcess.changeChildState(currentProcess.PID, "Terminated");
             }
         }
+
+        if (parentProcess.getState() == "Waiting"){
+            currentProcess.state = "Terminated";
+            parentProcess.changeChildState(currentProcess.PID, "Terminated");
+
+            AddProcessToReadyQueue(parentProcess);
+        } else {
+            currentProcess.state = "Terminated";
+            parentProcess.changeChildState(currentProcess.PID, "Terminated");
+            }
 
         nextProcess();
 
