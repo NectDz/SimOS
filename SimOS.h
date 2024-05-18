@@ -218,7 +218,6 @@ class SimOS
 
         // Recursively terminate child processes
         for (PCB &child : children) {
-            std::cout<< "Terminating process " << child.PID << std::endl;
             cascadeTermination(child.PID);
         }
 
