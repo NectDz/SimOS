@@ -171,7 +171,11 @@ class SimOS
         PCB &parentProcess = processTable[currentProcess.getParentID()];
 
 
-        cascadeTermination(currentPID);
+        if (currentProcess.getChildren().size() > 0) {
+            cascadeTermination(currentPID);
+        }
+
+        std::cout << "Terminating process " << currentPID << std::endl;
 
         auto it = memoryUsage.begin();
         while (it != memoryUsage.end()) {
@@ -191,14 +195,16 @@ class SimOS
             currentProcess.state = "Terminated";
             parentProcess.changeChildState(currentProcess.PID, "Terminated");
         }
-        
+        // current process state
+
+    
         nextProcess();
+
     }
 
     void cascadeTermination(int pid) {
         PCB &process = processTable[pid];
         std::vector<PCB> children = process.getChildren();
-        std::cout<< "Terminating process " << pid << std::endl;
 
          // Terminate the current process
         process.state = "Terminated";
