@@ -94,6 +94,10 @@ class SimOS
     void DiskReadRequest( int diskNumber, std::string fileName ){
         // Look up PCB using PID and change the state to waiting
 
+        PCB &currentProcess = processTable[currentPID];
+        currentProcess.state = "Waiting";
+        processTable[currentPID] = currentProcess;
+
         if (currentPID == NO_PROCESS) {
             throw std::logic_error("");
         }
@@ -107,6 +111,7 @@ class SimOS
     
         disks[diskNumber].addRequest(FileReadRequest{currentPID, fileName});
 
+        // Grab the next process from the ready queue and add it to the CPU
         nextProcess();
     }
 
