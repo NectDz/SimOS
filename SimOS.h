@@ -105,7 +105,7 @@ class SimOS
 
         // Add the process to the IO queue
     
-        disks[diskNumber].addRequest(FileReadRequest{currentPID, fileName});\
+        disks[diskNumber].addRequest(FileReadRequest{currentPID, fileName});
 
         nextProcess();
     }
