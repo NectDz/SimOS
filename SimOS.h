@@ -142,17 +142,6 @@ class SimOS
     }
 
     void SimFork() {
-        /* # PID Method
-        PCB process = processTable[currentPID];
-        PCB newProcess = process;
-        newProcess.PID = lastPID + 1;
-        lastPID = newProcess.PID;
-        processTable[newProcess.PID] = newProcess;
-        AddProcessToReadyQueue(newProcess, true);
-        */
-
-       // PCB Method
-
         if (currentPID == NO_PROCESS) {
             throw std::logic_error("");
         }
