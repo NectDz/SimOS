@@ -91,11 +91,6 @@ class SimOS
 
  
     void DiskReadRequest( int diskNumber, std::string fileName ){
-        // Look up PCB using PID and change the state to waiting
-
-        PCB &currentProcess = processTable[currentPID];
-        currentProcess.state = "Waiting";  
-
         if (currentPID == NO_PROCESS) {
             throw std::logic_error("No current process is using the CPU.s");
         }
@@ -104,6 +99,9 @@ class SimOS
         if (diskNumber >= static_cast<int>(disks.size()) || diskNumber < 0){
             throw std::out_of_range("Disk number is out of range");
         }
+
+        PCB &currentProcess = processTable[currentPID];
+        currentProcess.state = "Waiting";  
 
         // Add the process to the IO queue
     
@@ -127,10 +125,18 @@ class SimOS
     }
     
     std::deque<FileReadRequest> GetDiskQueue( int diskNumber ){
+        if (diskNumber >= static_cast<int>(disks.size()) || diskNumber < 0){
+            throw std::out_of_range("Disk number is out of range");
+        }
+
         return disks[diskNumber].getIOQueue();
     }
 
     void DiskJobCompleted(int diskNumber) {
+        if (diskNumber >= static_cast<int>(disks.size()) || diskNumber < 0){
+            throw std::out_of_range("Disk number is out of range");
+        }
+
         FileReadRequest IoQueue_Process = disks[diskNumber].DiskJobCompleted();
         PCB &process = processTable[IoQueue_Process.PID];
         AddProcessToReadyQueue(process);
@@ -167,6 +173,14 @@ class SimOS
         AddProcessToCPU(nextProcess, true); // Add New Process Test Case
     }
 
+    int GetCurrentProcessParentID() const {
+        if (currentPID == NO_PROCESS) {
+            throw std::logic_error("No current process is using the CPU.");
+        }
+
+        return processTable.at(currentPID).getParentID();
+    }
+
     void SimExit(){ // Implement Cascading Termination
         if (currentPID == NO_PROCESS) {
             throw std::logic_error("No current process is using the CPU.");
@@ -174,7 +188,6 @@ class SimOS
 
         PCB &currentProcess = processTable[currentPID];
         PCB &parentProcess = processTable[currentProcess.getParentID()];
-
 
         cascadeTermination(currentPID);
 
@@ -198,6 +211,7 @@ class SimOS
         }
         
         nextProcess();
+
     }
 
     void cascadeTermination(int pid) {

@@ -34,9 +34,9 @@ public:
         }
     }
 
-    PCB forkProcess(int pid) {
+    PCB forkProcess(int newPID) {
         PCB child = *this; 
-        child.PID = pid;
+        child.PID = newPID;
         child.parentPID = this->PID; 
         children.push_back(child); 
 
