@@ -356,15 +356,15 @@ class SimOS
             MemoryItem &lruItem = lruList.back();
             lruList.pop_back();
 
-            updateMemoryItem(lruItem);
+            updateMemoryItem(lruItem); // Find LRU and Update it
             
             lruItem.PID = currentPID;
-            lruList.push_front(lruItem);
+            lruList.push_front(lruItem); // Move to the front of the list since we accessed it
         } else if (isFull) { // If the memory is full remove the least recently used memory item and lru item are removed 
             MemoryItem &lruItem = lruList.back();
-            lruList.pop_back();
+            lruList.pop_back(); // Remove the least recently used item
 
-            deleteMemoryItem(lruItem);
+            deleteMemoryItem(lruItem); // Delete the LRU item from memory usage
         }
     }
 
