@@ -97,12 +97,12 @@ class SimOS
         currentProcess.state = "Waiting";  
 
         if (currentPID == NO_PROCESS) {
-            throw std::logic_error("");
+            throw std::logic_error("No current process is using the CPU.s");
         }
         
         // If Disk number doesnt exist through std::out_of_range exception
         if (diskNumber >= static_cast<int>(disks.size()) || diskNumber < 0){
-            throw std::out_of_range("");
+            throw std::out_of_range("Disk number is out of range");
         }
 
         // Add the process to the IO queue
@@ -114,6 +114,11 @@ class SimOS
     }
 
     FileReadRequest GetDisk( int diskNumber ){
+
+        if (diskNumber >= static_cast<int>(disks.size()) || diskNumber < 0){
+            throw std::out_of_range("Disk number is out of range");
+        }
+
         if (disks[diskNumber].isQueueEmpty()){
             return FileReadRequest{NO_PROCESS, ""};
         }
@@ -141,7 +146,7 @@ class SimOS
 
     void SimFork() {
         if (currentPID == NO_PROCESS) {
-            throw std::logic_error("");
+            throw std::logic_error("No current process is using the CPU.");
         }
         PCB &currentProcess = processTable[currentPID];
         lastPID++;
@@ -153,7 +158,7 @@ class SimOS
 
     void TimerInterrupt(){
         if (currentPID == NO_PROCESS) {
-            throw std::logic_error("");
+            throw std::logic_error("No current process is using the CPU.");
         }
 
         PCB &currentProcess = processTable[currentPID];
@@ -164,7 +169,7 @@ class SimOS
 
     void SimExit(){ // Implement Cascading Termination
         if (currentPID == NO_PROCESS) {
-            throw std::logic_error("");
+            throw std::logic_error("No current process is using the CPU.");
         }
 
         PCB &currentProcess = processTable[currentPID];
@@ -198,7 +203,6 @@ class SimOS
     void cascadeTermination(int pid) {
         PCB &process = processTable[pid];
         std::vector<PCB> children = process.getChildren();
-        std::cout<< "Terminating process " << pid << std::endl;
 
          // Terminate the current process
         process.state = "Terminated";
@@ -226,7 +230,7 @@ class SimOS
 
     void SimWait(){
         if (currentPID == NO_PROCESS) {
-            throw std::logic_error("");
+            throw std::logic_error("No current process is using the CPU.");
         }
 
         PCB &currentProcess = processTable[currentPID];
