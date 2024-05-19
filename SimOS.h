@@ -11,6 +11,7 @@
 #include "FileReadRequest.h"
 #include <unordered_map>
 #include <set> 
+#include <algorithm>
 
 struct MemoryItem
 {
@@ -325,7 +326,9 @@ class SimOS
     /**
         @post : Accesses the memory address
             If there is no process currently using the CPU, a logic_error exception will be thrown
-            The memory address will be accessed and added to the memoryUsage
+            The memory address will be accessed and added to the memoryUsage and lru list
+            If the memory address is already in memory, the memory item will be updated and moved to the front of the lru list
+            if the memory is full, the least recently used memory item and lru list will be removed and the new memory item will be added to the memoryUsage and lru list
     */
     void AccessMemoryAddress(unsigned long long address){
         if (currentPID == NO_PROCESS) {
@@ -333,9 +336,75 @@ class SimOS
         }
 
         unsigned long long pageNumber = address / pageSize;
-        unsigned long long frameNumber = memoryUsage.size();
 
-        memoryUsage.push_back(MemoryItem{pageNumber, frameNumber, currentPID});
+        // Check if the memory is full
+        bool isFull = memoryUsage.size() == static_cast<size_t>(maxFrames);
+
+        // Check if the page number is in memory
+        bool pageNumberFound = isPageAddressInMemory(pageNumber);
+        
+        // If the page number is not in memory and the memory is not full add the Memory item item to memory and lru list
+        if (!pageNumberFound && !isFull) {
+            unsigned long long frameNumber = frameCounter; 
+            frameCounter++;
+            
+            MemoryItem newItem{pageNumber, frameNumber, currentPID};
+
+            memoryUsage.push_back({newItem});
+            lruList.push_front(newItem);
+        } else if (pageNumberFound) { // If the page address is in memory update the lru memory item and move it to the front of the lru list
+            MemoryItem &lruItem = lruList.back();
+            lruList.pop_back();
+
+            updateMemoryItem(lruItem);
+            
+            lruItem.PID = currentPID;
+            lruList.push_front(lruItem);
+        } else if (isFull) { // If the memory is full remove the least recently used memory item and lru item are removed 
+            MemoryItem &lruItem = lruList.back();
+            lruList.pop_back();
+
+            deleteMemoryItem(lruItem);
+        }
+    }
+
+    /**
+        @post : Updates the memory item in the memoryUsage
+    */
+    void updateMemoryItem(const MemoryItem &itemToUpdate){
+        for (auto it = memoryUsage.begin(); it != memoryUsage.end(); ++it) {
+            if (it->PID == itemToUpdate.PID && it->pageNumber == itemToUpdate.pageNumber && it->frameNumber == itemToUpdate.frameNumber) {
+                it->PID = currentPID;
+                break;
+            }
+        }
+    }
+
+    /**
+        @post : Deletes the memory item from the memoryUsage
+    */
+    void deleteMemoryItem(const MemoryItem &itemToDelete){
+        auto it = memoryUsage.begin();
+        while (it != memoryUsage.end()) {
+            if (it->PID == itemToDelete.PID && it->pageNumber == itemToDelete.pageNumber && it->frameNumber == itemToDelete.frameNumber) {
+                it = memoryUsage.erase(it);
+            } else {
+                ++it;
+            }
+        }
+    }
+
+    /**
+        @return : returns true if the page address is in memory, false otherwise
+    */
+    bool isPageAddressInMemory(unsigned long long address){
+        for (auto item : memoryUsage) {
+            if (item.PID == currentPID && item.pageNumber == address) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -371,8 +440,12 @@ class SimOS
     }
 
     /* Returns the memoryUsage */
-    MemoryUsage GetMemory() const{
-        return memoryUsage;
+    MemoryUsage GetMemory() const {
+        MemoryUsage sortedMemoryUsage = memoryUsage; // Create a copy to sort
+        std::sort(sortedMemoryUsage.begin(), sortedMemoryUsage.end(), [](const MemoryItem &a, const MemoryItem &b) {
+            return a.frameNumber < b.frameNumber; // Sort by frameNumber
+        });
+        return sortedMemoryUsage;
     }
 
     /* Returns the ReadyQueue */
@@ -387,6 +460,8 @@ class SimOS
 
         int maxFrames; 
         MemoryUsage memoryUsage;
+        std::deque<MemoryItem> lruList;
+        int frameCounter = 0;
 
         std::deque<int> readyQueue; 
         std::vector<Disk> disks;
