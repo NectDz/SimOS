@@ -10,6 +10,7 @@
 #include "Disk.h"
 #include "FileReadRequest.h"
 #include <unordered_map>
+#include <algorithm>
 
 struct MemoryItem
 {
@@ -221,34 +222,6 @@ class SimOS
 
     }
 
-    void cascadeTermination(int pid) {
-        PCB &process = processTable[pid];
-        std::vector<PCB> children = process.getChildren();
-
-         // Terminate the current process
-        process.state = "Terminated";
-
-        // Remove from process table
-        processTable.erase(pid);
-
-        // Remove from memory usage
-        auto it = memoryUsage.begin();
-        while (it != memoryUsage.end()) {
-            if (it->PID == pid) {
-                it = memoryUsage.erase(it);
-            } else {
-                ++it;
-            }
-        }
-
-        // Recursively terminate child processes
-        for (PCB &child : children) {
-            cascadeTermination(child.PID);
-        }
-
-    
-    }
-
     void SimWait(){
         if (currentPID == NO_PROCESS) {
             throw std::logic_error("No current process is using the CPU.");
@@ -307,15 +280,34 @@ class SimOS
     }
 
     // Recurive loop through the children of the process
-    void recursiveChildren(int pid){
+    
+    void cascadeTermination(int pid) {
         PCB &process = processTable[pid];
-        std::vector<PCB> children = process.getChildren();
-
-        for (PCB &child : process.getChildren()){
-            std::cout << child.PID << std::endl;
-            recursiveChildren(child.PID);
+        std::vector<int> childrenToDelete; 
+        
+        for (PCB &child : process.getChildren()) {
+            if (std::find(childrenToDelete.begin(), childrenToDelete.end(), child.PID) == childrenToDelete.end()) {
+                childrenToDelete.push_back(child.PID);
+                cascadeTermination(child.PID);
+            }
         }
+
+        // Print the children to delete
+        for (int child : childrenToDelete) {
+            processTable.erase(child);
+        }
+
+        auto it = memoryUsage.begin();
+        while (it != memoryUsage.end()) {
+            if (it->PID == pid) {
+                it = memoryUsage.erase(it);
+            } else {
+                ++it;
+            }
+        }
+
     }
+
 
     // Get Process Table
     std::unordered_map<int, PCB> GetProcessTable() const{
@@ -338,10 +330,6 @@ class SimOS
         return processTable.at(currentPID).getParentID();
     }
 
-    std::vector<PCB> getProcessChildren(int pid) const {
-        return processTable.at(pid).getChildren();
-    }
-    
     // Make the private members of the class
     private:
         int numberOfDisks;

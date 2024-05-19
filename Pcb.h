@@ -21,7 +21,7 @@ public:
     // Constructor
     PCB(int id) : PID(id), state("New"), programCounter(0) {}
 
-    std::vector<PCB> getChildren() const {
+    std::vector<PCB>& getChildren() {
         return children;
     }
 
@@ -40,7 +40,7 @@ public:
         child.parentPID = this->PID; 
         child.state = "New";
         children.push_back(child); 
-
+        
         return child;
     }
 
