@@ -32,8 +32,8 @@ class SimOS
            @param    : The amount of RAM (a unsigned long long)
            @param    : The pageSize (a unsigned int)
 
-            @post     : Sets the number of disks, amount of RAM and pageSize to the value of the parameters.
-                It will also generate the max number of frames in RAM.
+            @post     : Sets the number of disks, amount of RAM and pageSize to the value of the parameters
+                It will also generate the max number of frames in RAM
     */
     SimOS( int numberOfDisks, unsigned long long amountOfRAM, unsigned int pageSize){
         this->numberOfDisks = numberOfDisks;
@@ -48,8 +48,8 @@ class SimOS
 
     
     /**
-        @post : Creates the number of disks specified by the parameter.
-            The disks are created with the disk number starting at 0.
+        @post : Creates the number of disks specified by the parameter
+            The disks are created with the disk number starting at 0
     */
     void CreateDisks( int numberOfDisks ){
         int startDiskNumber = 0;
@@ -61,6 +61,11 @@ class SimOS
         }
     }
 
+    /**
+        @post : Creates a new process and adds it to the CPU
+            If there is no process currently using the CPU, the new process will be added to the CPU
+            If there is a process currently using the CPU, the new process will be added to the ready queue
+    */
     void NewProcess( ){
         // Create a new PCB object
         int PID = lastPID + 1;
@@ -76,6 +81,12 @@ class SimOS
         }
     }
 
+    /**
+        @post : Adds the process to the ready queue
+            If the ready queue is empty and there is no process currently using the CPU, the process will be added to the CPU
+            If the ready queue is not empty, the process will be added to the ready queue
+    */
+
     void AddProcessToReadyQueue(const PCB &process){
         PCB &readyProcess = processTable[process.PID];
         readyProcess.state = "Ready";
@@ -89,6 +100,11 @@ class SimOS
         }
     }
 
+    /**
+        @post : Adds the process to the CPU
+            If the timerInterrupt is true, the process will be removed from the ready queue
+            If the timerInterrupt is false, the process will not be removed from the ready queue
+    */
     void AddProcessToCPU(PCB &process, int timerInterrupt = false){
         // Remove PID from the ready queue
         if (timerInterrupt && !readyQueue.empty()){
@@ -100,7 +116,14 @@ class SimOS
 
         currentPID = process.PID;
     }
- 
+    
+    /**
+        @post : Adds a disk read request to the specified disk
+            If the disk number is out of range, an out_of_range exception will be thrown
+            If there is no process currently using the CPU, a logic_error exception will be thrown
+            The process will be added to the IO queue
+            The next process from the ready queue will be added to the CPU
+    */
     void DiskReadRequest( int diskNumber, std::string fileName ){
         if (currentPID == NO_PROCESS) {
             throw std::logic_error("No current process is using the CPU.s");
@@ -122,6 +145,13 @@ class SimOS
         nextProcess();
     }
 
+    /**
+           @param : The number of disks (a int)
+
+            @post : Returns the disk read request from the specified disk
+                If the disk number is out of range, an out_of_range exception will be thrown
+                If the disk queue is empty, a FileReadRequest with NO_PROCESS and an empty string will be returned
+    */
     FileReadRequest GetDisk( int diskNumber ){
         if (diskNumber >= static_cast<int>(disks.size()) || diskNumber < 0){
             throw std::out_of_range("Disk number is out of range");
@@ -134,6 +164,12 @@ class SimOS
         return disks[diskNumber].processRequest();
     }
     
+    /**
+           @param : The disk Number (a int)
+
+            @post : Returns the disk queue from the next serving process on the disk specified
+                If the disk number is out of range, an out_of_range exception will be thrown
+    */
     std::deque<FileReadRequest> GetDiskQueue( int diskNumber ){
         if (diskNumber >= static_cast<int>(disks.size()) || diskNumber < 0){
             throw std::out_of_range("Disk number is out of range");
@@ -142,6 +178,13 @@ class SimOS
         return disks[diskNumber].getIOQueue();
     }
 
+    /**
+           @param : The disk Number (a int)
+
+            @post : Removes the next serving process from the disk specified
+                If the disk number is out of range, an out_of_range exception will be thrown
+                The process will be added to the ready queue
+    */
     void DiskJobCompleted(int diskNumber) {
         if (diskNumber >= static_cast<int>(disks.size()) || diskNumber < 0){
             throw std::out_of_range("Disk number is out of range");
@@ -152,6 +195,11 @@ class SimOS
         AddProcessToReadyQueue(process);
     }
 
+    /**
+        @post : Simulates a fork system call
+            If there is no process currently using the CPU, a logic_error exception will be thrown
+            The current process will be forked and added to the ready queue
+    */
     void SimFork() {
         if (currentPID == NO_PROCESS) {
             throw std::logic_error("No current process is using the CPU.");
@@ -167,6 +215,12 @@ class SimOS
         AddProcessToReadyQueue(childProcess);
     }
 
+    /**
+        @post : Simulates a timer interrupt
+            If there is no process currently using the CPU, a logic_error exception will be thrown
+            The current process will be added to the ready queue
+            The next process from the ready queue will be added to the CPU
+    */
     void TimerInterrupt(){
         if (currentPID == NO_PROCESS) {
             throw std::logic_error("No current process is using the CPU.");
@@ -178,6 +232,13 @@ class SimOS
         AddProcessToCPU(nextProcess, true); // Add New Process Test Case
     }
 
+    /**
+        @post : Simulates an exit system call
+            If there is no process currently using the CPU, a logic_error exception will be thrown
+            The current process will be terminated
+            If the parent process is in the waiting state, the current process will be added to the ready queue
+            If the parent process is not in the waiting state, the current process will be terminated and if it has children, the children will be removed
+    */
     void SimExit(){ 
         if (currentPID == NO_PROCESS) {
             throw std::logic_error("No current process is using the CPU.");
@@ -247,6 +308,10 @@ class SimOS
 
     }
 
+    /**
+        @post : Adds the next process from the ready queue to the CPU
+            If the ready queue is empty, the current process will be set to NO_PROCESS
+    */
     void nextProcess() {
         if (!readyQueue.empty()) {
             PCB &nextProcess = processTable[readyQueue.front()];
@@ -257,6 +322,11 @@ class SimOS
         }
     }
 
+    /**
+        @post : Accesses the memory address
+            If there is no process currently using the CPU, a logic_error exception will be thrown
+            The memory address will be accessed and added to the memoryUsage
+    */
     void AccessMemoryAddress(unsigned long long address){
         if (currentPID == NO_PROCESS) {
             throw std::logic_error("No process is currently using the CPU.");
@@ -268,10 +338,12 @@ class SimOS
         memoryUsage.push_back(MemoryItem{pageNumber, frameNumber, currentPID});
     }
 
+    /**
+        @post : Terminates the process and remove all of its children 
+    */
     void cascadeTermination(int pid) {
         PCB &process = processTable[pid];
         std::set<int> childrenToDelete; 
-
         
         for (PCB &child : process.getChildren()) {
             childrenToDelete.insert(child.PID);
