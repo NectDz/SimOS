@@ -26,6 +26,15 @@ constexpr int NO_PROCESS{ 0 };
 class SimOS
 {
     public:
+    /**
+        Parameterized constructor.
+           @param    : The number of disks (a int)
+           @param    : The amount of RAM (a unsigned long long)
+           @param    : The pageSize (a unsigned int)
+
+            @post     : Sets the number of disks, amount of RAM and pageSize to the value of the parameters.
+                It will also generate the max number of frames in RAM.
+    */
     SimOS( int numberOfDisks, unsigned long long amountOfRAM, unsigned int pageSize){
         this->numberOfDisks = numberOfDisks;
         this->amountOfRAM = amountOfRAM;
@@ -37,7 +46,11 @@ class SimOS
         CreateDisks(numberOfDisks);
     }
 
-    // Creates Number of Disks
+    
+    /**
+        @post : Creates the number of disks specified by the parameter.
+            The disks are created with the disk number starting at 0.
+    */
     void CreateDisks( int numberOfDisks ){
         int startDiskNumber = 0;
 
@@ -76,7 +89,6 @@ class SimOS
         }
     }
 
-
     void AddProcessToCPU(PCB &process, int timerInterrupt = false){
         // Remove PID from the ready queue
         if (timerInterrupt && !readyQueue.empty()){
@@ -88,11 +100,6 @@ class SimOS
 
         currentPID = process.PID;
     }
-
-    int GetCPU() const{
-        return currentPID;
-    }
-
  
     void DiskReadRequest( int diskNumber, std::string fileName ){
         if (currentPID == NO_PROCESS) {
@@ -116,7 +123,6 @@ class SimOS
     }
 
     FileReadRequest GetDisk( int diskNumber ){
-
         if (diskNumber >= static_cast<int>(disks.size()) || diskNumber < 0){
             throw std::out_of_range("Disk number is out of range");
         }
@@ -146,14 +152,6 @@ class SimOS
         AddProcessToReadyQueue(process);
     }
 
-    std::deque<int> GetReadyQueue(){
-        return readyQueue;
-    }
-
-    std::vector<Disk> GetDisks( ){
-        return disks;
-    }
-
     void SimFork() {
         if (currentPID == NO_PROCESS) {
             throw std::logic_error("No current process is using the CPU.");
@@ -161,14 +159,13 @@ class SimOS
 
         PCB &currentProcess = processTable[currentPID];
         lastPID++;
-        PCB childProcess = currentProcess.forkProcess(lastPID);  // Ensure this correctly initializes the state
+        PCB childProcess = currentProcess.forkProcess(lastPID); 
 
         processTable[childProcess.PID] = childProcess;
-        childProcess.state = "Ready";  // Explicitly set the state to Ready
+        childProcess.state = "Ready";  
 
         AddProcessToReadyQueue(childProcess);
     }
-
 
     void TimerInterrupt(){
         if (currentPID == NO_PROCESS) {
@@ -181,15 +178,7 @@ class SimOS
         AddProcessToCPU(nextProcess, true); // Add New Process Test Case
     }
 
-    int GetCurrentProcessParentID() const {
-        if (currentPID == NO_PROCESS) {
-            throw std::logic_error("No current process is using the CPU.");
-        }
-
-        return processTable.at(currentPID).getParentID();
-    }
-
-    void SimExit(){ // Implement Cascading Termination
+    void SimExit(){ 
         if (currentPID == NO_PROCESS) {
             throw std::logic_error("No current process is using the CPU.");
         }
@@ -279,8 +268,6 @@ class SimOS
         memoryUsage.push_back(MemoryItem{pageNumber, frameNumber, currentPID});
     }
 
-    // Recurive loop through the children of the process
-
     void cascadeTermination(int pid) {
         PCB &process = processTable[pid];
         std::set<int> childrenToDelete; 
@@ -306,29 +293,21 @@ class SimOS
 
     }
 
-
-    // Get Process Table
-    std::unordered_map<int, PCB> GetProcessTable() const{
-        return processTable;
+    /* Returns the current running process PID */
+    int GetCPU() const{
+        return currentPID;
     }
-    
 
+    /* Returns the memoryUsage */
     MemoryUsage GetMemory() const{
         return memoryUsage;
     }
 
-    // Getters
-    int getNumberOfDisks() const { return numberOfDisks; }
-
-    int currentProcessParentID() const {
-        if (currentPID == NO_PROCESS) {
-            throw std::logic_error("No current process is using the CPU.");
-        }
-
-        return processTable.at(currentPID).getParentID();
+    /* Returns the ReadyQueue */
+    std::deque<int> GetReadyQueue(){
+        return readyQueue;
     }
 
-    // Make the private members of the class
     private:
         int numberOfDisks;
         unsigned long long amountOfRAM;
