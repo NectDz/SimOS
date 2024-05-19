@@ -62,9 +62,10 @@ class SimOS
         }
     }
 
-    void AddProcessToReadyQueue(PCB &process){
+    void AddProcessToReadyQueue(const PCB &process){
         PCB &readyProcess = processTable[process.PID];
         readyProcess.state = "Ready";
+        processTable[readyProcess.PID] = readyProcess;
 
         if (readyQueue.empty() && currentPID == NO_PROCESS){
             AddProcessToCPU(readyProcess);
@@ -74,6 +75,7 @@ class SimOS
         }
     }
 
+
     void AddProcessToCPU(PCB &process, int timerInterrupt = false){
         // Remove PID from the ready queue
         if (timerInterrupt && !readyQueue.empty()){
@@ -81,6 +83,7 @@ class SimOS
         }
         
         process.state = "Running";
+        processTable[process.PID] = process;
 
         currentPID = process.PID;
     }
@@ -142,7 +145,7 @@ class SimOS
         AddProcessToReadyQueue(process);
     }
 
-    std::deque<int> GetReadyQueue( ){
+    std::deque<int> GetReadyQueue(){
         return readyQueue;
     }
 
@@ -154,13 +157,17 @@ class SimOS
         if (currentPID == NO_PROCESS) {
             throw std::logic_error("No current process is using the CPU.");
         }
+
         PCB &currentProcess = processTable[currentPID];
         lastPID++;
-        PCB childProcess = currentProcess.forkProcess(lastPID);
+        PCB childProcess = currentProcess.forkProcess(lastPID);  // Ensure this correctly initializes the state
 
         processTable[childProcess.PID] = childProcess;
+        childProcess.state = "Ready";  // Explicitly set the state to Ready
+
         AddProcessToReadyQueue(childProcess);
     }
+
 
     void TimerInterrupt(){
         if (currentPID == NO_PROCESS) {
@@ -298,6 +305,22 @@ class SimOS
 
         memoryUsage.push_back(MemoryItem{pageNumber, frameNumber, currentPID});
     }
+
+    // Recurive loop through the children of the process
+    void recursiveChildren(int pid){
+        PCB &process = processTable[pid];
+        std::vector<PCB> children = process.getChildren();
+
+        for (PCB &child : process.getChildren()){
+            std::cout << child.PID << std::endl;
+            recursiveChildren(child.PID);
+        }
+    }
+
+    // Get Process Table
+    std::unordered_map<int, PCB> GetProcessTable() const{
+        return processTable;
+    }
     
 
     MemoryUsage GetMemory() const{
@@ -306,8 +329,19 @@ class SimOS
 
     // Getters
     int getNumberOfDisks() const { return numberOfDisks; }
-    
 
+    int currentProcessParentID() const {
+        if (currentPID == NO_PROCESS) {
+            throw std::logic_error("No current process is using the CPU.");
+        }
+
+        return processTable.at(currentPID).getParentID();
+    }
+
+    std::vector<PCB> getProcessChildren(int pid) const {
+        return processTable.at(pid).getChildren();
+    }
+    
     // Make the private members of the class
     private:
         int numberOfDisks;

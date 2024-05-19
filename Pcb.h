@@ -38,6 +38,7 @@ public:
         PCB child = *this; 
         child.PID = newPID;
         child.parentPID = this->PID; 
+        child.state = "New";
         children.push_back(child); 
 
         return child;
