@@ -388,6 +388,7 @@ class SimOS
         while (it != memoryUsage.end()) {
             if (it->PID == itemToDelete.PID && it->pageNumber == itemToDelete.pageNumber && it->frameNumber == itemToDelete.frameNumber) {
                 it = memoryUsage.erase(it);
+                break;
             } else {
                 ++it;
             }
