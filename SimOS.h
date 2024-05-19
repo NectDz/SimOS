@@ -10,7 +10,7 @@
 #include "Disk.h"
 #include "FileReadRequest.h"
 #include <unordered_map>
-#include <algorithm>
+#include <set> 
 
 struct MemoryItem
 {
@@ -280,21 +280,15 @@ class SimOS
     }
 
     // Recurive loop through the children of the process
-    
+
     void cascadeTermination(int pid) {
         PCB &process = processTable[pid];
-        std::vector<int> childrenToDelete; 
+        std::set<int> childrenToDelete; 
+
         
         for (PCB &child : process.getChildren()) {
-            if (std::find(childrenToDelete.begin(), childrenToDelete.end(), child.PID) == childrenToDelete.end()) {
-                childrenToDelete.push_back(child.PID);
-                cascadeTermination(child.PID);
-            }
-        }
-
-        // Print the children to delete
-        for (int child : childrenToDelete) {
-            processTable.erase(child);
+            childrenToDelete.insert(child.PID);
+            cascadeTermination(child.PID);
         }
 
         auto it = memoryUsage.begin();
@@ -304,6 +298,10 @@ class SimOS
             } else {
                 ++it;
             }
+        }
+
+        for (int child : childrenToDelete) {
+            processTable.erase(child);
         }
 
     }
