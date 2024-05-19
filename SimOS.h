@@ -244,7 +244,7 @@ class SimOS
                 processTable.erase(child.PID);
 
                 currentProcess.state = "Running";
-                processTable[currentPID] = currentProcess;
+
                 zombie = true;
                 break;
             }
